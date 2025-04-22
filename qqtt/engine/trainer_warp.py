@@ -571,6 +571,7 @@ class InvPhyTrainerWarp:
             if key in self.key_mappings:
                 idx, change = self.key_mappings[key]
                 target_change[idx] += change
+        self.pressed_keys.clear()
         return target_change
 
     def init_control_ui(self):
@@ -1065,8 +1066,8 @@ class InvPhyTrainerWarp:
             target_points = torch.from_numpy(vis_controller_points).to("cuda")
             self.hand_left_pos = self._find_closest_point(target_points)
 
-        listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
-        listener.start()
+        # listener = keyboard.Listener(on_press=self.on_press, on_release=self.on_release)
+        # listener.start()
         self.target_change = np.zeros((n_ctrl_parts, 3))
 
         ############## Temporary timer ##############
@@ -1220,6 +1221,15 @@ class InvPhyTrainerWarp:
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
             cv2.imshow("Interactive Playground", frame)
+            # KEY HANDLING GOES HERE
+            key = cv2.waitKey(1) & 0xFF
+            if key != 255:
+                try:
+                    char = chr(key).lower()
+                    self.pressed_keys.add(char)
+                    print(f"[cv2] Key pressed: {char}")
+                except ValueError:
+                    pass
             cv2.waitKey(1)
 
             frame_comp_time = (
