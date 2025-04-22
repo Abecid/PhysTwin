@@ -111,27 +111,28 @@ if PROCESS_SHAPE_PRIOR and SHAPE_PRIOR:
         os.system(
             f"python ./data_process/segment_util_image.py --img_path {base_path}/{case_name}/shape/high_resolution.png --TEXT_PROMPT {category} --output_path {base_path}/{case_name}/shape/masked_image.png"
         )
-
+    
+    # Trellis on Case Segment from Upscaled Image
     with Timer("Shape Prior Generation"):
         os.system(
             f"python ./data_process/shape_prior.py --img_path {base_path}/{case_name}/shape/masked_image.png --output_dir {base_path}/{case_name}/shape"
         )
 
 if PROCESS_TRACK:
-    # Get the dense tracking of the object using Co-tracker
+    # Get the dense tracking of the object using Co-tracker (hands and category object based on initial segment masks)
     with Timer("Dense Tracking"):
         os.system(
             f"python ./data_process/dense_track.py --base_path {base_path} --case_name {case_name}"
         )
 
 if PROCESS_3D:
-    # Get the pcd in the world coordinate from the raw observations
+    # Get the pcd in the world coordinate from the raw observations (Depth based Point Cloud)
     with Timer("Lift to 3D"):
         os.system(
             f"python ./data_process/data_process_pcd.py --base_path {base_path} --case_name {case_name}"
         )
 
-    # Further process and filter the noise of object and controller masks
+    # Further process and filter the noise of object and controller masks (Filter Controller and Object Point Clouds and Masks)
     with Timer("Mask Post-Processing"):
         os.system(
             f"python ./data_process/data_process_mask.py --base_path {base_path} --case_name {case_name} --controller_name {CONTROLLER_NAME}"
